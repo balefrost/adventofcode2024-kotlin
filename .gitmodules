@@ -1,0 +1,3 @@
+[submodule "src/main/resources/inputs"]
+	path = src/main/resources/inputs
+	url = git@github.com:balefrost/adventofcode2024-inputs.git
