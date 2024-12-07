@@ -14,42 +14,58 @@ fun readInputLines(filename: String): List<String> {
     return allLines.subList(0, lastRelevantIndex + 1)
 }
 
-fun sortPartiallyOrdered(pages: Iterable<Int>, getDeps: (Int) -> Iterable<Int>): Iterable<Int> {
-    return sequence<Int> {
-        val emitted = mutableSetOf<Int>()
-        for (page in pages) {
-            val onStack = mutableSetOf(page)
-            val stack = mutableListOf(ArrayDeque<Int>().also { it.add(page) })
-            while (stack.isNotEmpty()) {
+fun <T> sortPartiallyOrdered(items: Iterable<T>, getDeps: (T) -> Iterable<T>): Iterable<T> {
+    return sequence<T> {
+        val emitted = mutableSetOf<T>()
+        for (firstItem in items) {
+            val onStack = mutableSetOf(firstItem)
+
+            // invariant: contains 0 or more deques, each of which contains at least 1 item.
+            val stack = mutableListOf(ArrayDeque<T>().also { it.add(firstItem) })
+
+            fun removeTopOfStack(): T {
+                val removedItem = stack.last().removeFirst()
+                onStack -= removedItem
                 if (stack.last().isEmpty()) {
                     stack.removeLast()
-                    continue
+                } else {
+                    onStack += stack.last().first()
                 }
+                return removedItem
+            }
 
-                val item = stack.last().first()
-                if (emitted.contains(item)) {
-                    stack.last().removeFirst()
-                    onStack -= item
-                    continue
-                }
-                val deps = ArrayDeque<Int>()
-                for (dep in getDeps(item)) {
-                    if (dep in emitted) {
+            fun addToTopOfStack(items: Iterable<T>): Boolean {
+                val deps = ArrayDeque<T>()
+                for (item in items) {
+                    if (item in emitted) {
                         continue
                     }
-                    if (!onStack.add(dep)) {
-                        val cycleItems = listOf(dep) + stack.asReversed().map { it[0] }.takeWhile { it != dep } + listOf(dep)
+                    deps.addLast(item)
+                }
+
+                if (deps.isNotEmpty()) {
+                    val firstDep = deps.first()
+                    if (!onStack.add(firstDep)) {
+                        val cycleItems = listOf(firstDep) + stack.asReversed().map { it[0] }.takeWhile { it != firstDep } + listOf(firstDep)
                         throw IllegalArgumentException("Dependency cycle ${cycleItems.asReversed().joinToString(" -> ")}")
                     }
-                    deps.addLast(dep)
+                    stack.addLast(deps)
+                    return true
                 }
-                if (deps.isEmpty()) {
-                    stack.last().removeFirst()
-                    onStack -= item
+
+                return false
+            }
+
+            while (stack.isNotEmpty()) {
+                val item = stack.last().first()
+                if (emitted.contains(item)) {
+                    removeTopOfStack()
+                    continue
+                }
+                if (!addToTopOfStack(getDeps(item))) {
+                    removeTopOfStack()
                     emitted += item
                     yield(item)
-                } else {
-                    stack.add(deps)
                 }
             }
         }

@@ -72,4 +72,18 @@ class UtilsTest {
         }
         assertThat(ex.message, containsString("2 -> 3 -> 4 -> 2"))
     }
+
+    @Test
+    fun `test sortPartiallyOrdered with false cycle`() {
+        val deps = mapOf(
+            4 to setOf(5),
+            3 to setOf(4, 5),
+            2 to setOf(3, 5),
+            1 to setOf(2, 5)
+        )
+        assertThat(
+            sortPartiallyOrdered(listOf(1)) { deps.getOrDefault(it, emptySet()) }.toList(),
+            equalTo(listOf(5, 4, 3, 2, 1))
+        )
+    }
 }
