@@ -86,4 +86,60 @@ class UtilsTest {
             equalTo(listOf(5, 4, 3, 2, 1))
         )
     }
+
+    @Test
+    fun `binarySearch matches first item`() {
+        assertThat(
+            binarySearch((0..10).toList()) { compareValues(0, it) },
+            equalTo(0))
+    }
+
+    @Test
+    fun `binarySearch matches last item`() {
+        assertThat(
+            binarySearch((0..10).toList()) { compareValues(10, it) },
+            equalTo(10))
+    }
+
+    @Test
+    fun `binarySearch matches exact middle item`() {
+        assertThat(
+            binarySearch((0..10).toList()) { compareValues(5, it) },
+            equalTo(5))
+    }
+
+    @Test
+    fun `binarySearch matches item in first half`() {
+        assertThat(
+            binarySearch((0..10).toList()) { compareValues(2, it) },
+            equalTo(2))
+    }
+
+    @Test
+    fun `binarySearch matches item in second half`() {
+        assertThat(
+            binarySearch((0..10).toList()) { compareValues(7, it) },
+            equalTo(7))
+    }
+
+    @Test
+    fun `binarySearch finds insertion point before start`() {
+        assertThat(
+            binarySearch((0..10).toList()) { compareValues(-1, it) },
+            equalTo(0.inv()))
+    }
+
+    @Test
+    fun `binarySearch finds insertion point after end`() {
+        assertThat(
+            binarySearch((0..10).toList()) { compareValues(11, it) },
+            equalTo(11.inv()))
+    }
+
+    @Test
+    fun `binarySearch finds insertion point between items`() {
+        assertThat(
+            binarySearch((0..10).map { it.toDouble()}.toList()) { compareValues(3.5, it) },
+            equalTo(4.inv()))
+    }
 }

@@ -46,8 +46,15 @@ fun <T> sortPartiallyOrdered(items: Iterable<T>, getDeps: (T) -> Iterable<T>): I
                 if (deps.isNotEmpty()) {
                     val firstDep = deps.first()
                     if (!onStack.add(firstDep)) {
-                        val cycleItems = listOf(firstDep) + stack.asReversed().map { it[0] }.takeWhile { it != firstDep } + listOf(firstDep)
-                        throw IllegalArgumentException("Dependency cycle ${cycleItems.asReversed().joinToString(" -> ")}")
+                        val cycleItems =
+                            listOf(firstDep) + stack.asReversed().map { it[0] }.takeWhile { it != firstDep } + listOf(
+                                firstDep
+                            )
+                        throw IllegalArgumentException(
+                            "Dependency cycle ${
+                                cycleItems.asReversed().joinToString(" -> ")
+                            }"
+                        )
                     }
                     stack.addLast(deps)
                     return true
@@ -70,4 +77,22 @@ fun <T> sortPartiallyOrdered(items: Iterable<T>, getDeps: (T) -> Iterable<T>): I
             }
         }
     }.asIterable()
+}
+
+fun <T> binarySearch(items: List<T>, comparison: (T) -> Int): Int {
+    var low = 0
+    var high = items.size
+    while (low < high) {
+        val mid = low + (high - low) / 2
+        val midItem = items[mid]
+        val comp = comparison(midItem)
+        if (comp < 0) {
+            high = mid
+        } else if (comp > 0) {
+            low = mid + 1
+        } else {
+            return mid
+        }
+    }
+    return low.inv()
 }
