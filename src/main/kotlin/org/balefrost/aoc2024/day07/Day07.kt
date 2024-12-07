@@ -12,18 +12,25 @@ fun parseInput(lines: List<String>): List<Input> {
     }
 }
 
-fun <T> cartesianProduct(items: List<List<T>>): Sequence<List<T>> {
-    if (items.isEmpty()) {
-        return sequenceOf(emptyList())
-    }
+fun evaluateNumbers(numbers: List<Long>, target: Long, possibleOperators: List<(Long, Long) -> Long>): Boolean {
+    fun helper(acc: Long, numbers: List<Long>, target: Long, possibleOperators: List<(Long, Long) -> Long>): Boolean {
+        if (acc > target) {
+            return false
+        }
 
-    return sequence {
-        for (item in items.first()) {
-            for (tail in cartesianProduct(items.subList(1, items.size))) {
-                yield(listOf(item) + tail)
+        if (numbers.isEmpty()) {
+            return acc == target
+        }
+
+        for (operator in possibleOperators) {
+            if (helper(operator(acc, numbers[0]), numbers.subList(1, numbers.size), target, possibleOperators)) {
+                return true
             }
         }
+        return false
     }
+
+    return helper(numbers[0], numbers.drop(1), target, possibleOperators)
 }
 
 object Day07Part01 {
@@ -33,18 +40,10 @@ object Day07Part01 {
 
         val input = parseInput(lines)
         val result = input.filter { inp ->
-            val operatorSequences = cartesianProduct((0 until inp.numbers.size - 1).map { listOf('+', '*') })
-            operatorSequences.any { ops ->
-                val result = ops.zip(inp.numbers.drop(1)).fold(inp.numbers[0]) { acc, opNum ->
-                    val (op, num) = opNum
-                    if (op == '+') {
-                        acc + num
-                    } else {
-                        acc * num
-                    }
-                }
-                result == inp.testValue
-            }
+            evaluateNumbers(inp.numbers, inp.testValue, listOf(
+                { acc: Long, num: Long -> acc + num },
+                { acc: Long, num: Long -> acc * num }
+            ))
         }.sumOf { it.testValue }
         println(result)
     }
@@ -57,20 +56,11 @@ object Day07Part02 {
 
         val input = parseInput(lines)
         val result = input.filter { inp ->
-            val operatorSequences = cartesianProduct((0 until inp.numbers.size - 1).map { listOf("+", "*", "||") })
-            operatorSequences.any { ops ->
-                val result = ops.zip(inp.numbers.drop(1)).fold(inp.numbers[0]) { acc, opNum ->
-                    val (op, num) = opNum
-                    if (op == "+") {
-                        acc + num
-                    } else if (op == "*") {
-                        acc * num
-                    } else {
-                        (acc.toString() + num.toString()).toLong()
-                    }
-                }
-                result == inp.testValue
-            }
+            evaluateNumbers(inp.numbers, inp.testValue, listOf(
+                { acc: Long, num: Long -> acc + num },
+                { acc: Long, num: Long -> acc * num },
+                { acc: Long, num: Long -> "$acc$num".toLong() }
+            ))
         }.sumOf { it.testValue }
         println(result)
     }
