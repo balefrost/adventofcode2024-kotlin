@@ -91,55 +91,118 @@ class UtilsTest {
     fun `binarySearch matches first item`() {
         assertThat(
             binarySearch((0..10).toList()) { compareValues(0, it) },
-            equalTo(0))
+            equalTo(0)
+        )
     }
 
     @Test
     fun `binarySearch matches last item`() {
         assertThat(
             binarySearch((0..10).toList()) { compareValues(10, it) },
-            equalTo(10))
+            equalTo(10)
+        )
     }
 
     @Test
     fun `binarySearch matches exact middle item`() {
         assertThat(
             binarySearch((0..10).toList()) { compareValues(5, it) },
-            equalTo(5))
+            equalTo(5)
+        )
     }
 
     @Test
     fun `binarySearch matches item in first half`() {
         assertThat(
             binarySearch((0..10).toList()) { compareValues(2, it) },
-            equalTo(2))
+            equalTo(2)
+        )
     }
 
     @Test
     fun `binarySearch matches item in second half`() {
         assertThat(
             binarySearch((0..10).toList()) { compareValues(7, it) },
-            equalTo(7))
+            equalTo(7)
+        )
     }
 
     @Test
     fun `binarySearch finds insertion point before start`() {
         assertThat(
             binarySearch((0..10).toList()) { compareValues(-1, it) },
-            equalTo(0.inv()))
+            equalTo(0.inv())
+        )
     }
 
     @Test
     fun `binarySearch finds insertion point after end`() {
         assertThat(
             binarySearch((0..10).toList()) { compareValues(11, it) },
-            equalTo(11.inv()))
+            equalTo(11.inv())
+        )
     }
 
     @Test
     fun `binarySearch finds insertion point between items`() {
         assertThat(
-            binarySearch((0..10).map { it.toDouble()}.toList()) { compareValues(3.5, it) },
-            equalTo(4.inv()))
+            binarySearch((0..10).map { it.toDouble() }.toList()) { compareValues(3.5, it) },
+            equalTo(4.inv())
+        )
+    }
+
+    @Test
+    fun `cartesian product of zero options`() {
+        assertThat(
+            cartesianProduct<Int>(emptyList()).toList(),
+            equalTo(listOf(emptyList<Int>()))
+        )
+    }
+
+    @Test
+    fun `cartesian product of one set of options`() {
+        assertThat(
+            cartesianProduct(listOf(listOf("a", "b", "c"))).toList(),
+            equalTo(
+                listOf(
+                    listOf("a"),
+                    listOf("b"),
+                    listOf("c"),
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `cartesian product of many singleton sets of options`() {
+        assertThat(
+            cartesianProduct(listOf(listOf("a"), listOf("b"), listOf("c"))).toList(),
+            equalTo(listOf(listOf("a", "b", "c")))
+        )
+    }
+
+    @Test
+    fun `cartesian product of three sets of two options each`() {
+        assertThat(
+            cartesianProduct(
+                listOf(
+                    listOf("a", "b"),
+                    listOf("j", "k"),
+                    listOf("x", "y")
+                )
+            ).toList(),
+            equalTo(
+                listOf(
+                    listOf("a", "j", "x"),
+                    listOf("a", "j", "y"),
+                    listOf("a", "k", "x"),
+                    listOf("a", "k", "y"),
+                    listOf("b", "j", "x"),
+                    listOf("b", "j", "y"),
+                    listOf("b", "k", "x"),
+                    listOf("b", "k", "y"),
+                )
+            )
+        )
     }
 }

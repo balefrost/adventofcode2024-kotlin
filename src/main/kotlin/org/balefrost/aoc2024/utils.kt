@@ -96,3 +96,18 @@ fun <T> binarySearch(items: List<T>, comparison: (T) -> Int): Int {
     }
     return low.inv()
 }
+
+fun <T> cartesianProduct(items: List<List<T>>): Sequence<List<T>> {
+    if (items.isEmpty()) {
+        return sequenceOf(emptyList())
+    }
+
+    return sequence {
+        for (item in items.first()) {
+            for (tail in cartesianProduct(items.subList(1, items.size))) {
+                yield(listOf(item) + tail)
+            }
+        }
+    }
+}
+
