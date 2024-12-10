@@ -15,7 +15,7 @@ fun readInputLines(filename: String): List<String> {
 }
 
 fun <T> sortPartiallyOrdered(items: Iterable<T>, getDeps: (T) -> Iterable<T>): Iterable<T> {
-    return sequence<T> {
+    return sequence {
         val emitted = mutableSetOf<T>()
         for (firstItem in items) {
             val onStack = mutableSetOf(firstItem)

@@ -30,7 +30,7 @@ fun findAdjacent(input: Input, pos: XY): Set<XY> {
 }
 
 fun walk(input: Input, pos: XY): Sequence<XY> {
-    return sequence<XY> {
+    return sequence {
         val fringe = ArrayDeque<XY>()
         fringe.add(pos)
         while (fringe.isNotEmpty()) {

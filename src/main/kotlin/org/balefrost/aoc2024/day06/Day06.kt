@@ -39,10 +39,10 @@ fun doWalk(initialState: PosDir, map: List<String>): WalkResult {
         if (!inBounds(newState.pos)) {
             break
         }
-        if (map[newState.pos.y][newState.pos.x] == '#') {
-            currentState = currentState.turnRight()
+        currentState = if (map[newState.pos.y][newState.pos.x] == '#') {
+            currentState.turnRight()
         } else {
-            currentState = newState
+            newState
         }
     }
     return WalkResult(visitedStates.toList(), WalkTermination.OffEdge)

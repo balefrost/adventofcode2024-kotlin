@@ -155,7 +155,7 @@ class UtilsTest {
     fun `cartesian product of zero options`() {
         assertThat(
             cartesianProduct<Int>(emptyList()).toList(),
-            equalTo(listOf(emptyList<Int>()))
+            equalTo(listOf(emptyList()))
         )
     }
 

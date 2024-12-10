@@ -19,9 +19,9 @@ object Day01Part01 {
     @JvmStatic
     fun main(args: Array<String>) {
         val (lefts, rights) = getNumbers()
-        val totalDistance = lefts.sorted().zip(rights.sorted()).map { (left, right) ->
+        val totalDistance = lefts.sorted().zip(rights.sorted()).sumOf { (left, right) ->
             abs(left - right)
-        }.sum()
+        }
         println(totalDistance)
     }
 }
@@ -31,6 +31,6 @@ object Day01Part02 {
     fun main(args: Array<String>) {
         val (lefts, rights) = getNumbers()
         val rightLookup = rights.groupBy { it }.mapValues { it.value.size }
-        println(lefts.map { left -> left * rightLookup.getOrDefault(left, 0) }.sum())
+        println(lefts.sumOf { left -> left * rightLookup.getOrDefault(left, 0) })
     }
 }
