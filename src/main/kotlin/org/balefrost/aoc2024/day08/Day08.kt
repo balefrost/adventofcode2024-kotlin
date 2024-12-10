@@ -1,23 +1,13 @@
 package org.balefrost.aoc2024.day08
 
+import org.balefrost.aoc2024.StringBased2DMap
+import org.balefrost.aoc2024.XY
 import org.balefrost.aoc2024.readInputLines
 
-data class XY(val x: Int, val y: Int) {
-    operator fun minus(other: XY): XY = XY(x - other.x, y - other.y)
-    operator fun plus(other: XY): XY = XY(x + other.x, y + other.y)
-    operator fun unaryMinus() = XY(-x, -y)
-}
-
-data class WH(val w: Int, val h: Int) {
-    operator fun contains(xy: XY): Boolean {
-        return xy.x in 0..<w && xy.y in 0..<h
-    }
-}
-
-data class Input(val antennaLocations: Map<Char, Set<XY>>, val dims: WH)
+data class Input(val antennaLocations: Map<Char, Set<XY>>, val map: StringBased2DMap)
 
 fun getInput(lines: List<String>): Input {
-    val dims = WH(lines[0].length, lines.size)
+    val map = StringBased2DMap(lines)
 
     val antennaLocations = mutableMapOf<Char, MutableSet<XY>>()
     for (y in lines.indices) {
@@ -28,12 +18,12 @@ fun getInput(lines: List<String>): Input {
         }
     }
 
-    return Input(antennaLocations, dims)
+    return Input(antennaLocations, map)
 }
 
-fun generateAntinodes(pos: XY, dir: XY, dims: WH) = generateSequence(pos) {
+fun generateAntinodes(pos: XY, dir: XY, map: StringBased2DMap) = generateSequence(pos) {
     val newPos = it + dir
-    if (newPos !in dims) {
+    if (newPos !in map) {
         null
     } else {
         newPos

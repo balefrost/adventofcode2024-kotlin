@@ -1,16 +1,7 @@
 package org.balefrost.aoc2024.day06
 
+import org.balefrost.aoc2024.XY
 import org.balefrost.aoc2024.readInputLines
-
-data class XY(val x: Int, val y: Int) {
-    fun turnRight(): XY {
-        return XY(-y, x)
-    }
-
-    operator fun plus(other: XY): XY {
-        return XY(x + other.x, y + other.y)
-    }
-}
 
 data class PosDir(val pos: XY, val dir: XY) {
     fun turnRight(): PosDir {

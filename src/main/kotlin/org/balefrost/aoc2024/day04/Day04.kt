@@ -1,8 +1,7 @@
 package org.balefrost.aoc2024.day04
 
+import org.balefrost.aoc2024.XY
 import org.balefrost.aoc2024.readInputLines
-
-data class XY(val x: Int, val y: Int)
 
 val dirs = (-1..1).flatMap { x ->
     (-1..1).map { y ->

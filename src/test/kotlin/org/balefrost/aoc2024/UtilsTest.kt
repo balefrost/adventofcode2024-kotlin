@@ -205,4 +205,83 @@ class UtilsTest {
             )
         )
     }
+
+    @Test
+    fun `XY turns right`() {
+        assertThat(XY(1, 0).turnRight(), equalTo(XY(0, 1)))
+        assertThat(XY(0, 1).turnRight(), equalTo(XY(-1, 0)))
+        assertThat(XY(-1, 0).turnRight(), equalTo(XY(0, -1)))
+        assertThat(XY(0, -1).turnRight(), equalTo(XY(1, 0)))
+    }
+
+    @Test
+    fun `StringBased2dMap contains checks bounds`() {
+        val map = StringBased2DMap("""
+            0
+            01
+            012
+            0123
+            01234
+        """.trimIndent().lines())
+
+        assertThat(XY(0, 0) in map, equalTo(true))
+        assertThat(XY(0, 1) in map, equalTo(true))
+        assertThat(XY(0, 2) in map, equalTo(true))
+        assertThat(XY(0, 3) in map, equalTo(true))
+        assertThat(XY(0, 4) in map, equalTo(true))
+        assertThat(XY(1, 1) in map, equalTo(true))
+        assertThat(XY(2, 2) in map, equalTo(true))
+        assertThat(XY(3, 3) in map, equalTo(true))
+        assertThat(XY(4, 4) in map, equalTo(true))
+
+        assertThat(XY(-1, 0) in map, equalTo(false))
+        assertThat(XY(-1, 1) in map, equalTo(false))
+        assertThat(XY(-1, 2) in map, equalTo(false))
+        assertThat(XY(-1, 3) in map, equalTo(false))
+        assertThat(XY(-1, 4) in map, equalTo(false))
+        assertThat(XY(0, -1) in map, equalTo(false))
+        assertThat(XY(0, 5) in map, equalTo(false))
+        assertThat(XY(1, 0) in map, equalTo(false))
+        assertThat(XY(1, 5) in map, equalTo(false))
+        assertThat(XY(2, 1) in map, equalTo(false))
+        assertThat(XY(2, 5) in map, equalTo(false))
+        assertThat(XY(3, 2) in map, equalTo(false))
+        assertThat(XY(3, 5) in map, equalTo(false))
+        assertThat(XY(4, 3) in map, equalTo(false))
+        assertThat(XY(4, 5) in map, equalTo(false))
+        assertThat(XY(5, 4) in map, equalTo(false))
+    }
+
+    @Test
+    fun `StringBased2dMap get within bounds`() {
+        val map = StringBased2DMap("""
+            0123
+            4567
+        """.trimIndent().lines())
+
+        assertThat(map[XY(0, 0)], equalTo('0'))
+        assertThat(map[XY(1, 0)], equalTo('1'))
+        assertThat(map[XY(2, 0)], equalTo('2'))
+        assertThat(map[XY(3, 0)], equalTo('3'))
+        assertThat(map[XY(0, 1)], equalTo('4'))
+        assertThat(map[XY(1, 1)], equalTo('5'))
+        assertThat(map[XY(2, 1)], equalTo('6'))
+        assertThat(map[XY(3, 1)], equalTo('7'))
+    }
+
+    @Test
+    fun `StringBased2dMap out of bounds`() {
+        val map = StringBased2DMap("""
+            0123
+            4567
+        """.trimIndent().lines())
+
+        assertThrows<IndexOutOfBoundsException> {
+            map[XY(-10, 0)]
+        }
+
+        assertThrows<IndexOutOfBoundsException> {
+            map[XY(0, -10)]
+        }
+    }
 }

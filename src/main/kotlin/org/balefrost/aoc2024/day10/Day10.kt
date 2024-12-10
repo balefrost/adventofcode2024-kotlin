@@ -1,46 +1,24 @@
 package org.balefrost.aoc2024.day10
 
+import org.balefrost.aoc2024.StringBased2DMap
+import org.balefrost.aoc2024.XY
 import org.balefrost.aoc2024.readInputLines
 
-data class XY(val x: Int, val y: Int) {
-    operator fun minus(other: XY): XY = XY(x - other.x, y - other.y)
-    operator fun plus(other: XY): XY = XY(x + other.x, y + other.y)
-    operator fun unaryMinus() = XY(-x, -y)
-    val adjacent
-        get() = listOf(
-            this + XY(1, 0),
-            this + XY(0, 1),
-            this + XY(-1, 0),
-            this + XY(0, -1)
-        )
-}
+class Input(input: List<String>) {
+    val map = StringBased2DMap(input)
 
-data class WH(val w: Int, val h: Int) {
-    operator fun contains(xy: XY): Boolean {
-        return xy.x in 0..<w && xy.y in 0..<h
-    }
-}
+    val positions = map.positions
 
-data class Input(val map: List<String>) {
-    val bounds = WH(map[0].length, map.size)
+    operator fun contains(pos: XY): Boolean = map.contains(pos)
 
-    fun getHeight(pos: XY) = when (val d = map[pos.y][pos.x]) {
+    fun getHeight(pos: XY) = when (val d = map[pos]) {
         '.' -> -1
         else -> d.digitToInt()
     }
 }
 
-fun findStart(input: Input): Set<XY> {
-    return sequence {
-        for (y in 0..<input.bounds.h) {
-            for (x in 0..<input.bounds.w) {
-                val pos = XY(x, y)
-                if (input.getHeight(pos) == 0) {
-                    yield(pos)
-                }
-            }
-        }
-    }.toSet()
+fun findStart(input: Input): Sequence<XY> {
+    return input.positions.filter { input.getHeight(it) == 0 }
 }
 
 fun findAdjacent(input: Input, pos: XY): Set<XY> {
@@ -48,7 +26,7 @@ fun findAdjacent(input: Input, pos: XY): Set<XY> {
     if (currentHeight == 9) {
         return emptySet()
     }
-    return pos.adjacent.filterTo(mutableSetOf()) { it in input.bounds && input.getHeight(it) == currentHeight + 1 }
+    return pos.adjacent.filterTo(mutableSetOf()) { it in input && input.getHeight(it) == currentHeight + 1 }
 }
 
 fun walk(input: Input, pos: XY): Sequence<XY> {

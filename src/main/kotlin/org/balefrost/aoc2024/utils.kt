@@ -111,3 +111,37 @@ fun <T> cartesianProduct(items: List<List<T>>): Sequence<List<T>> {
     }
 }
 
+/**
+ * Left-handed XY cartesian point
+ */
+data class XY(val x: Int, val y: Int) {
+    operator fun minus(other: XY): XY = XY(x - other.x, y - other.y)
+    operator fun plus(other: XY): XY = XY(x + other.x, y + other.y)
+    operator fun unaryMinus() = XY(-x, -y)
+    fun turnRight(): XY {
+        return XY(-y, x)
+    }
+    val adjacent
+        get() = listOf(
+            this + XY(1, 0),
+            this + XY(0, 1),
+            this + XY(-1, 0),
+            this + XY(0, -1)
+        )
+}
+
+class StringBased2DMap(val lines: List<String>) {
+    operator fun contains(pos: XY): Boolean = pos.y in lines.indices && pos.x in lines[pos.y].indices
+
+    operator fun get(pos: XY) = lines[pos.y][pos.x]
+
+    val positions get() = sequence {
+        for (y in lines.indices) {
+            for (x in lines[y].indices) {
+                yield(XY(x, y))
+            }
+        }
+    }
+}
+
+
