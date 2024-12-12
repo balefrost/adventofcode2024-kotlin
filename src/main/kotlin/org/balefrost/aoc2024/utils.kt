@@ -111,6 +111,17 @@ fun <T> cartesianProduct(items: List<List<T>>): Sequence<List<T>> {
     }
 }
 
+interface EightWay<T> {
+    val n: T
+    val ne: T
+    val e: T
+    val se: T
+    val s: T
+    val sw: T
+    val w: T
+    val nw: T
+}
+
 /**
  * Left-handed XY cartesian point
  */
@@ -121,27 +132,78 @@ data class XY(val x: Int, val y: Int) {
     fun turnRight(): XY {
         return XY(-y, x)
     }
+
     val adjacent
-        get() = listOf(
+        get() = sequenceOf(
             this + XY(1, 0),
             this + XY(0, 1),
             this + XY(-1, 0),
             this + XY(0, -1)
         )
-}
 
-class StringBased2DMap(val lines: List<String>) {
-    operator fun contains(pos: XY): Boolean = pos.y in lines.indices && pos.x in lines[pos.y].indices
+    inner class Dirs8Way : EightWay<XY>, Iterable<XY> {
+        override val n: XY get() = this@XY + XY(0, -1)
+        override val ne: XY get() = this@XY + XY(1, -1)
+        override val e: XY get() = this@XY + XY(1, 0)
+        override val se: XY get() = this@XY + XY(1, 1)
+        override val s: XY get() = this@XY + XY(0, 1)
+        override val sw: XY get() = this@XY + XY(-1, 1)
+        override val w: XY get() = this@XY + XY(-1, 0)
+        override val nw: XY get() = this@XY + XY(-1, -1)
 
-    operator fun get(pos: XY) = lines[pos.y][pos.x]
-
-    val positions get() = sequence {
-        for (y in lines.indices) {
-            for (x in lines[y].indices) {
-                yield(XY(x, y))
+        fun <T> map(fn: (XY) -> T): EightWay<T> {
+            return object : EightWay<T> {
+                override val n: T = fn(this@Dirs8Way.n)
+                override val ne: T = fn(this@Dirs8Way.ne)
+                override val e: T = fn(this@Dirs8Way.e)
+                override val se: T = fn(this@Dirs8Way.se)
+                override val s: T = fn(this@Dirs8Way.s)
+                override val sw: T = fn(this@Dirs8Way.sw)
+                override val w: T = fn(this@Dirs8Way.w)
+                override val nw: T = fn(this@Dirs8Way.nw)
             }
         }
+
+        override fun iterator(): Iterator<XY> = iterator {
+            yield(n)
+            yield(ne)
+            yield(e)
+            yield(se)
+            yield(s)
+            yield(sw)
+            yield(w)
+            yield(nw)
+        }
     }
+
+    val dirs8way = Dirs8Way()
+}
+
+data class WH(val w: Int, val h: Int)
+
+class StringBased2DMap(val lines: List<String>, val oobChar: Char? = null) {
+    operator fun contains(pos: XY): Boolean = pos.y in lines.indices && pos.x in lines[pos.y].indices
+
+    operator fun get(pos: XY): Char {
+        if (pos !in this) {
+            if (oobChar != null) {
+                return oobChar
+            }
+            throw IndexOutOfBoundsException("$pos")
+        }
+        return lines[pos.y][pos.x]
+    }
+
+    val dims get() = WH(lines[0].length, lines.size)
+
+    val positions
+        get() = sequence {
+            for (y in lines.indices) {
+                for (x in lines[y].indices) {
+                    yield(XY(x, y))
+                }
+            }
+        }
 }
 
 
