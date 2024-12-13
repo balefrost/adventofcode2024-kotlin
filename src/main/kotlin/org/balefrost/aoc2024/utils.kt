@@ -179,6 +179,16 @@ data class XY(val x: Int, val y: Int) {
     val dirs8way = Dirs8Way()
 }
 
+/**
+ * Left-handed XY cartesian point
+ */
+data class LongXY(val x: Long, val y: Long) {
+    operator fun minus(other: LongXY) = LongXY(x - other.x, y - other.y)
+    operator fun plus(other: LongXY) = LongXY(x + other.x, y + other.y)
+    operator fun times(multiplier: Long) = LongXY(x * multiplier, y * multiplier)
+    operator fun unaryMinus() = LongXY(-x, -y)
+}
+
 data class WH(val w: Int, val h: Int)
 
 class StringBased2DMap(val lines: List<String>, val oobChar: Char? = null) {
