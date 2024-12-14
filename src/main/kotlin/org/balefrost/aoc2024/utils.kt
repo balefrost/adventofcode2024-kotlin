@@ -187,6 +187,8 @@ data class LongXY(val x: Long, val y: Long) {
     operator fun plus(other: LongXY) = LongXY(x + other.x, y + other.y)
     operator fun times(multiplier: Long) = LongXY(x * multiplier, y * multiplier)
     operator fun unaryMinus() = LongXY(-x, -y)
+    operator fun div(divisor: Long) = LongXY(x / divisor, y / divisor)
+    operator fun rem(divisor: LongXY) = LongXY(x % divisor.x, y % divisor.y)
 }
 
 data class WH(val w: Int, val h: Int)
