@@ -193,6 +193,71 @@ data class LongXY(val x: Long, val y: Long) {
 
 data class WH(val w: Int, val h: Int)
 
+class MutableMap2DImpl(data: Iterable<Iterable<Char>>, val oobChar: Char?) : MutableMap2D {
+    private val data: List<MutableList<Char>> = data.map { it.toMutableList() }
+    override val dims: WH
+
+    init {
+        check(this.data.isNotEmpty() && this.data.all { it.size == this.data[0].size })
+        this.dims = WH(this.data[0].size, this.data.size)
+    }
+
+    override fun contains(pos: XY): Boolean {
+        return pos.x in 0..<dims.w && pos.y in 0..<dims.h
+    }
+
+    override fun get(pos: XY): Char {
+        return when {
+            pos in this -> data[pos.y][pos.x]
+            oobChar != null -> return oobChar
+            else -> throw IndexOutOfBoundsException("$pos outside $dims")
+        }
+    }
+
+    override val positions: Sequence<XY>
+        get() = sequence {
+            for (y in 0..<dims.h) {
+                for (x in 0..<dims.w) {
+                    yield(XY(x, y))
+                }
+            }
+        }
+
+    override fun toMutableMap2D(): MutableMap2D {
+        return MutableMap2DImpl(data, oobChar)
+    }
+
+    override fun set(pos: XY, value: Char) {
+        data[pos.y][pos.x] = value
+    }
+
+    override fun toString(): String {
+        return " " + (0..<dims.w).joinToString("") { (it % 10).toString() } + "\n" +
+        data.withIndex().map { (index, chars) -> (index % 10).toString() + chars.joinToString("") }.joinToString("\n")
+    }
+}
+
+interface Map2D {
+    operator fun contains(pos: XY): Boolean
+
+    operator fun get(pos: XY): Char
+
+    val dims: WH
+
+    val positions: Sequence<XY>
+
+    fun toMutableMap2D(): MutableMap2D
+}
+
+interface MutableMap2D : Map2D {
+    operator fun set(pos: XY, value: Char)
+}
+
+fun makeMutableMapFromLines(lines: List<String>, oobChar: Char? = null): MutableMap2D {
+    check(lines.isNotEmpty() && lines.all { it.length == lines[0].length })
+    return MutableMap2DImpl(lines.map { it.toList() }, oobChar)
+}
+
 class StringBased2DMap(val lines: List<String>, val oobChar: Char? = null) {
     operator fun contains(pos: XY): Boolean = pos.y in lines.indices && pos.x in lines[pos.y].indices
 
@@ -217,5 +282,4 @@ class StringBased2DMap(val lines: List<String>, val oobChar: Char? = null) {
             }
         }
 }
-
 
