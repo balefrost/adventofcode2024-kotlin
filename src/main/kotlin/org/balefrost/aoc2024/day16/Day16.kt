@@ -1,9 +1,12 @@
 package org.balefrost.aoc2024.day16
 
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.plus
 import org.balefrost.aoc2024.XY
 import org.balefrost.aoc2024.makeMutableMapFromLines
 import org.balefrost.aoc2024.readInputLines
-import java.util.PriorityQueue
+import java.util.*
 
 fun <T> dijkstra(init: T, getNextStates: (T) -> List<Pair<Long, T>>): Map<T, Long> {
 
@@ -63,11 +66,12 @@ interface FullDijkstraCell<T> {
 }
 
 fun <T> fullDijkstra(init: T, getNextStates: (T) -> List<Pair<Long, T>>): Map<T, FullDijkstraCell<T>> {
-    data class FullDijkstraCellImpl<T>(override val cost: Long, override val paths: List<List<T>>) : FullDijkstraCell<T>
+    data class FullDijkstraCellImpl<T>(override val cost: Long, override val paths: List<PersistentList<T>>) :
+        FullDijkstraCell<T>
 
-    val cache = mutableMapOf(init to FullDijkstraCellImpl(0L, listOf(listOf(init))))
-    val queue = PriorityQueue<Pair<Long, List<T>>>(compareBy { it.first })
-    queue.add(0L to listOf(init))
+    val cache = mutableMapOf(init to FullDijkstraCellImpl(0L, listOf(persistentListOf(init))))
+    val queue = PriorityQueue<Pair<Long, PersistentList<T>>>(compareBy { it.first })
+    queue.add(0L to persistentListOf(init))
 
     while (queue.isNotEmpty()) {
         val (costSoFar, pathSoFar) = queue.remove()
