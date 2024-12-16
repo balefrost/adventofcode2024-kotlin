@@ -129,6 +129,9 @@ data class XY(val x: Int, val y: Int) {
     operator fun minus(other: XY): XY = XY(x - other.x, y - other.y)
     operator fun plus(other: XY): XY = XY(x + other.x, y + other.y)
     operator fun unaryMinus() = XY(-x, -y)
+    fun turnLeft(): XY {
+        return XY(y, -x)
+    }
     fun turnRight(): XY {
         return XY(-y, x)
     }
