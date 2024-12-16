@@ -22,27 +22,32 @@ data class LongRect(val xy: LongXY, val wh: LongXY) {
     }
 }
 
+fun computeSafety(positions: Iterable<LongXY>, dims: LongXY): Long {
+    val quadrants = LongArray(4)
+    val mid = (dims - LongXY(1, 1)) / 2
+    for (p in positions) {
+        var q = 0
+        when {
+            p.x < mid.x -> {}
+            p.x > mid.x -> q += 1
+            else -> q += 100
+        }
+        when {
+            p.y < mid.y -> {}
+            p.y > mid.y -> q += 2
+            else -> q += 100
+        }
+        if (q > 3) continue
+        ++quadrants[q]
+    }
+    return quadrants.reduce(Long::times)
+}
+
 object Day14Part01 {
     @JvmStatic
     fun main(args: Array<String>) {
         val lines = readInputLines("inputs/day14.txt")
         val dims = LongRect(LongXY(0, 0), LongXY(101, 103))
-//        val lines = """
-//            p=0,4 v=3,-3
-//            p=6,3 v=-1,-3
-//            p=10,3 v=-1,2
-//            p=2,0 v=2,-1
-//            p=0,0 v=1,3
-//            p=3,0 v=-2,-2
-//            p=7,6 v=-1,-3
-//            p=3,0 v=-1,-2
-//            p=9,3 v=2,3
-//            p=7,3 v=-1,2
-//            p=2,4 v=2,-3
-//            p=9,5 v=-3,-3
-//        """.trimIndent().lines()
-//        val dims = LongRect(LongXY(0, 0), LongXY(11, 7))
-
         val lineRegex = """p=(-?\d+),(-?\d+) v=(-?\d+),(-?\d+)""".toRegex()
 
         val robots = lines.map { line ->
@@ -59,14 +64,7 @@ object Day14Part01 {
             Robot(pp, v)
         }
 
-        val mid = (dims.wh - LongXY(1, 1)) / 2
-        val topLeft = LongRect(LongXY(0, 0), mid)
-        val topRight = LongRect(LongXY(mid.x + 1, 0), mid)
-        val bottomLeft = LongRect(LongXY(0, mid.y + 1), mid)
-        val bottomRight = LongRect(LongXY(mid.x + 1, mid.y + 1), mid)
-        val quadrants = listOf(topLeft, topRight, bottomLeft, bottomRight)
-        val safety = movedRobots.groupBy { r -> quadrants.filter { r.p in it }.toSet() }
-            .filterNot { it.key.isEmpty() }.values.map { it.count() }.fold(1, Long::times)
+        val safety = computeSafety(movedRobots.asSequence().map { it.p }.asIterable(), dims.wh)
         println(safety)
     }
 }
@@ -126,9 +124,15 @@ object Day14Part02 {
 
         var robotSet = initialRobots
 
-        data class Position(val time: Long, val positions: Set<LongXY>)
+        data class Position(val time: Long, val positions: Set<LongXY>, val safety: Long)
 
-        val positions = mutableListOf(Position(0, robotSet.mapTo(mutableSetOf()) { it.p }))
+        val positions = mutableListOf(
+            Position(
+                0,
+                robotSet.mapTo(mutableSetOf()) { it.p },
+                computeSafety(robotSet.mapTo(mutableListOf()) { it.p }, dims.wh)
+            )
+        )
         for (time in 1..cycleTime) {
             robotSet = robotSet.map { it.step() }
             val quadrants = LongArray(4)
@@ -147,10 +151,19 @@ object Day14Part02 {
                 if (q > 3) continue
                 ++quadrants[q]
             }
-            positions.add(Position(time, robotSet.mapTo(mutableSetOf()) { it.p }))
+            positions.add(
+                Position(
+                    time,
+                    robotSet.mapTo(mutableSetOf()) { it.p },
+                    computeSafety(robotSet.mapTo(mutableListOf()) { it.p }, dims.wh)
+                )
+            )
         }
-        positions.sortByDescending { it.positions.size }
+//        positions.sortByDescending { it.positions.size }
+        positions.sortBy { it.safety }
         println(positions[0].time)
+
+
         check(initialRobots == robotSet)
         val robotPane = object : JComponent() {
             val magnification = 4
@@ -188,7 +201,7 @@ object Day14Part02 {
 
         fun refreshIndexLabel() {
             indexLabel.text =
-                "${currentIndex + 1} / ${positions.size} - ${positions[currentIndex].positions.size} / ${initialRobots.size} - (${positions[currentIndex].time})"
+                "${currentIndex + 1} / ${positions.size} - ${positions[currentIndex].positions.size} / ${initialRobots.size} - ${positions[currentIndex].safety} - (${positions[currentIndex].time})"
         }
 
         fun moveToIndex(index: Int) {
