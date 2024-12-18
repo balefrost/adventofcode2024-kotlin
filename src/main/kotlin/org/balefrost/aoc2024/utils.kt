@@ -132,6 +132,7 @@ data class XY(val x: Int, val y: Int) {
     fun turnLeft(): XY {
         return XY(y, -x)
     }
+
     fun turnRight(): XY {
         return XY(-y, x)
     }
@@ -236,7 +237,8 @@ class MutableMap2DImpl(data: Iterable<Iterable<Char>>, val oobChar: Char?) : Mut
 
     override fun toString(): String {
         return " " + (0..<dims.w).joinToString("") { (it % 10).toString() } + "\n" +
-        data.withIndex().map { (index, chars) -> (index % 10).toString() + chars.joinToString("") }.joinToString("\n")
+                data.withIndex().map { (index, chars) -> (index % 10).toString() + chars.joinToString("") }
+                    .joinToString("\n")
     }
 }
 
@@ -259,6 +261,10 @@ interface MutableMap2D : Map2D {
 fun makeMutableMapFromLines(lines: List<String>, oobChar: Char? = null): MutableMap2D {
     check(lines.isNotEmpty() && lines.all { it.length == lines[0].length })
     return MutableMap2DImpl(lines.map { it.toList() }, oobChar)
+}
+
+fun makeMutableMap(w: Int, h: Int, backgroundChar: Char, oobChar: Char? = null): MutableMap2DImpl {
+    return MutableMap2DImpl((0..<h).map { (0..<w).map { backgroundChar } }, oobChar)
 }
 
 class StringBased2DMap(val lines: List<String>, val oobChar: Char? = null) {
