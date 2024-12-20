@@ -1,6 +1,8 @@
 package org.balefrost.aoc2024
 
 import java.io.InputStreamReader
+import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 fun readInputFile(filename: String) =
     InputStreamReader(ClassLoader.getSystemClassLoader().getResourceAsStream(filename)!!).use { it.readText() }
@@ -144,6 +146,21 @@ data class XY(val x: Int, val y: Int) {
             this + XY(-1, 0),
             this + XY(0, -1)
         )
+
+    fun allWithinDistance(distance: Int): Sequence<XY> {
+        return sequence {
+            for (yy in y - distance..y + distance) {
+                val span = distance - (yy - y).absoluteValue
+                for (xx in x - span .. x + span) {
+                    yield(XY(xx, yy))
+                }
+            }
+        }
+    }
+
+    fun manhattanDistanceTo(other: XY): Int {
+        return abs(x - other.x) + abs(y - other.y)
+    }
 
     inner class Dirs8Way : EightWay<XY>, Iterable<XY> {
         override val n: XY get() = this@XY + XY(0, -1)
