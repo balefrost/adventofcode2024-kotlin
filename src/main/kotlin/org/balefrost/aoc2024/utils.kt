@@ -3,6 +3,7 @@ package org.balefrost.aoc2024
 import java.io.InputStreamReader
 import kotlin.math.abs
 import kotlin.math.absoluteValue
+import kotlin.math.sign
 
 fun readInputFile(filename: String) =
     InputStreamReader(ClassLoader.getSystemClassLoader().getResourceAsStream(filename)!!).use { it.readText() }
@@ -131,6 +132,9 @@ data class XY(val x: Int, val y: Int) {
     operator fun minus(other: XY): XY = XY(x - other.x, y - other.y)
     operator fun plus(other: XY): XY = XY(x + other.x, y + other.y)
     operator fun unaryMinus() = XY(-x, -y)
+    operator fun div(other: XY): XY = XY(x / other.x, y/ other.y)
+    val sign: XY get() = XY(x.sign, y.sign)
+
     fun turnLeft(): XY {
         return XY(y, -x)
     }
