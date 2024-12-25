@@ -216,13 +216,15 @@ class UtilsTest {
 
     @Test
     fun `StringBased2dMap contains checks bounds`() {
-        val map = StringBased2DMap("""
+        val map = StringBased2DMap(
+            """
             0
             01
             012
             0123
             01234
-        """.trimIndent().lines())
+        """.trimIndent().lines()
+        )
 
         assertThat(XY(0, 0) in map, equalTo(true))
         assertThat(XY(0, 1) in map, equalTo(true))
@@ -254,10 +256,12 @@ class UtilsTest {
 
     @Test
     fun `StringBased2dMap get within bounds`() {
-        val map = StringBased2DMap("""
+        val map = StringBased2DMap(
+            """
             0123
             4567
-        """.trimIndent().lines())
+        """.trimIndent().lines()
+        )
 
         assertThat(map[XY(0, 0)], equalTo('0'))
         assertThat(map[XY(1, 0)], equalTo('1'))
@@ -271,10 +275,12 @@ class UtilsTest {
 
     @Test
     fun `StringBased2dMap out of bounds`() {
-        val map = StringBased2DMap("""
+        val map = StringBased2DMap(
+            """
             0123
             4567
-        """.trimIndent().lines())
+        """.trimIndent().lines()
+        )
 
         assertThrows<IndexOutOfBoundsException> {
             map[XY(-10, 0)]
@@ -283,5 +289,34 @@ class UtilsTest {
         assertThrows<IndexOutOfBoundsException> {
             map[XY(0, -10)]
         }
+    }
+
+    @Test
+    fun `permutations of empty list`() {
+        assertThat(emptyList<String>().permutations.toList(), equalTo(listOf(emptyList())))
+    }
+
+    @Test
+    fun `permutations of singleton list`() {
+        assertThat(listOf("foo").permutations.toList(), equalTo(listOf(listOf("foo"))))
+    }
+
+    @Test
+    fun `permutations of two element list`() {
+        assertThat(listOf("a", "b").permutations.toList(), containsInAnyOrder(listOf("a", "b"), listOf("b", "a")))
+    }
+
+    @Test
+    fun `permutations of three element list`() {
+        assertThat(
+            listOf("a", "b", "c").permutations.toList(), containsInAnyOrder(
+                listOf("a", "b", "c"),
+                listOf("a", "c", "b"),
+                listOf("b", "a", "c"),
+                listOf("b", "c", "a"),
+                listOf("c", "a", "b"),
+                listOf("c", "b", "a")
+            )
+        )
     }
 }

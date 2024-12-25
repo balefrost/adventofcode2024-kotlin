@@ -59,7 +59,7 @@ fun <T> sortPartiallyOrdered(items: Iterable<T>, getDeps: (T) -> Iterable<T>): I
                             }"
                         )
                     }
-                    stack.addLast(deps)
+                    stack.add(deps)
                     return true
                 }
 
@@ -155,7 +155,7 @@ data class XY(val x: Int, val y: Int) {
         return sequence {
             for (yy in y - distance..y + distance) {
                 val span = distance - (yy - y).absoluteValue
-                for (xx in x - span .. x + span) {
+                for (xx in x - span..x + span) {
                     yield(XY(xx, yy))
                 }
             }
@@ -313,3 +313,18 @@ class StringBased2DMap(val lines: List<String>, val oobChar: Char? = null) {
         }
 }
 
+val <T> List<T>.permutations: Sequence<List<T>>
+    get() {
+        if (isEmpty()) {
+            return sequenceOf(emptyList())
+        }
+        return sequence {
+            for (i in this@permutations.indices) {
+                val first = this@permutations[i]
+                val rest = this@permutations.subList(0, i) + this@permutations.subList(i + 1, this@permutations.size)
+                for (r in rest.permutations) {
+                    yield(listOf(first) + r)
+                }
+            }
+        }
+    }
